@@ -4,7 +4,6 @@ import axios from "axios";
 function Dashboard() {
 
     const [title, setTitle] = useState("");
-
     const [tasks, setTasks] = useState([]);
 
     const token = localStorage.getItem("token");
@@ -24,12 +23,12 @@ function Dashboard() {
     };
 
     useEffect(() => {
-
         getTasks();
-
     }, []);
 
     const addTask = async () => {
+
+        if (!title) return;
 
         await axios.post(
             "http://localhost:5000/api/tasks",
@@ -41,9 +40,9 @@ function Dashboard() {
             }
         );
 
-        getTasks();
-
         setTitle("");
+
+        getTasks();
     };
 
     const deleteTask = async (id) => {
@@ -60,15 +59,32 @@ function Dashboard() {
         getTasks();
     };
 
+    const updateStatus = async (id, status) => {
+
+        await axios.put(
+            `http://localhost:5000/api/tasks/${id}`,
+            {
+                status
+            },
+            {
+                headers: {
+                    token
+                }
+            }
+        );
+
+        getTasks();
+    };
+
     return (
 
         <div className="container">
 
-            <h2>Dashboard</h2>
+            <h1>Task Dashboard</h1>
 
             <input
                 type="text"
-                placeholder="Task title"
+                placeholder="Enter task"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
             />
@@ -77,6 +93,8 @@ function Dashboard() {
                 Add Task
             </button>
 
+            <h2>Your Tasks</h2>
+
             {
                 tasks.map((task) => (
 
@@ -84,7 +102,26 @@ function Dashboard() {
 
                         <h3>{task.title}</h3>
 
-                        <button onClick={() => deleteTask(task._id)}>
+                        <p>Status: {task.status}</p>
+
+                        <button
+                            onClick={() =>
+                                updateStatus(
+                                    task._id,
+                                    task.status === "Pending"
+                                    ? "Completed"
+                                    : "Pending"
+                                )
+                            }
+                        >
+                            Toggle Status
+                        </button>
+
+                        <br /><br />
+
+                        <button
+                            onClick={() => deleteTask(task._id)}
+                        >
                             Delete
                         </button>
 

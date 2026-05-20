@@ -30,4 +30,16 @@ router.delete("/:id", auth, async (req, res) => {
     res.json("Task Deleted");
 });
 
+router.put("/:id", auth, async (req, res) => {
+
+    await Task.findByIdAndUpdate(
+        req.params.id,
+        {
+            status: req.body.status
+        }
+    );
+
+    res.json("Task Updated");
+});
+
 module.exports = router;
